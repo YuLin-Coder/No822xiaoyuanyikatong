@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiehuanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shebei_id as shebeiId
+        ,a.yonghu_id as yonghuId
+        ,a.zhujie_time as zhujieTime
+        ,a.zhujie_types as zhujieTypes
+        ,a.guihuan_time as guihuanTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiehuanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,shebei.sbname as sbname
+        ,shebei.sbimg_photo as sbimgPhoto
+        ,shebei.shebei_types as shebeiTypes
+        ,shebei.tongzhi_content as tongzhiContent
+        ,yonghu.name as name
+        ,yonghu.username as username
+        ,yonghu.password as password
+        ,yonghu.img_photo as imgPhoto
+        ,yonghu.sex_types as sexTypes
+        ,yonghu.phone as phone
+        ,yonghu.id_number as idNumber
+        ,yonghu.role as role
+
+        FROM jiehuan  a
+        left JOIN shebei shebei ON a.shebei_id = shebei.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.shebeiId != null">
+                and a.shebei_id = #{params.shebeiId}
+            </if>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.zhujieTimeStart != '' and params.zhujieTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.zhujie_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.zhujieTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.zhujieTimeEnd != '' and params.zhujieTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.zhujie_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.zhujieTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test="params.zhujieTypes != null">
+                and a.zhujie_types = #{params.zhujieTypes}
+            </if>
+            <if test=" params.guihuanTimeStart != '' and params.guihuanTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.guihuan_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.guihuanTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.guihuanTimeEnd != '' and params.guihuanTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.guihuan_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.guihuanTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test=" params.sbname != '' and params.sbname != null and params.sbname != 'null' ">
+                and shebei.sbname like CONCAT('%',#{params.sbname},'%')
+            </if>
+            <if test="params.shebeiTypes != null">
+                and shebei.shebei_types = #{params.shebeiTypes}
+            </if>
+
+            <if test=" params.tongzhiContent != '' and params.tongzhiContent != null and params.tongzhiContent != 'null' ">
+                and shebei.tongzhi_content like CONCAT('%',#{params.tongzhiContent},'%')
+            </if>
+            <if test=" params.name != '' and params.name != null and params.name != 'null' ">
+                and yonghu.name like CONCAT('%',#{params.name},'%')
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and yonghu.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and yonghu.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.phone != '' and params.phone != null and params.phone != 'null' ">
+                and yonghu.phone like CONCAT('%',#{params.phone},'%')
+            </if>
+            <if test=" params.idNumber != '' and params.idNumber != null and params.idNumber != 'null' ">
+                and yonghu.id_number like CONCAT('%',#{params.idNumber},'%')
+            </if>
+            <if test=" params.role != '' and params.role != null and params.role != 'null' ">
+                and yonghu.role like CONCAT('%',#{params.role},'%')
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>

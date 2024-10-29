@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiaofeileixingDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.name as name
+        ,a.money as money
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiaofeileixingView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM jiaofeileixing  a
+
+        <where>
+            <if test=" params.name != '' and params.name != null and params.name != 'null' ">
+                and a.name like CONCAT('%',#{params.name},'%')
+            </if>
+            <if test="params.moneyStart != null ">
+                <![CDATA[  and a.money >= #{params.moneyStart}   ]]>
+            </if>
+            <if test="params.moneyEnd != null ">
+                <![CDATA[  and a.money <= #{params.moneyEnd}   ]]>
+            </if>
+
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>

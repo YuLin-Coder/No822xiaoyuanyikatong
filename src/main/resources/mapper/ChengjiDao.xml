@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ChengjiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.exam_name as examName
+        ,a.kemu_types as kemuTypes
+        ,a.fraction as fraction
+        ,a.create_time as createTime
+    </sql>
+
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ChengjiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.username as username
+        ,yonghu.name as name
+        ,yonghu.phone as phone
+        ,yonghu.id_number as idNumber
+        ,yonghu.sex_types as sexTypes
+
+        FROM chengji  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.examName != '' and params.examName != null and params.examName != 'null' ">
+                and a.exam_name like CONCAT('%',#{params.examName},'%')
+            </if>
+            <if test="params.kemuTypes != null">
+                and a.kemu_types = #{params.kemuTypes}
+            </if>
+            <if test="params.fractionStart != null ">
+                <![CDATA[  and a.fraction >= #{params.fractionStart}   ]]>
+            </if>
+            <if test="params.fractionEnd != null ">
+                <![CDATA[  and a.fraction <= #{params.fractionEnd}   ]]>
+            </if>
+
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and yonghu.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and yonghu.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.name != '' and params.name != null and params.name != 'null' ">
+                and yonghu.name like CONCAT('%',#{params.name},'%')
+            </if>
+            <if test=" params.phone != '' and params.phone != null and params.phone != 'null' ">
+                and yonghu.phone like CONCAT('%',#{params.phone},'%')
+            </if>
+            <if test=" params.idNumber != '' and params.idNumber != null and params.idNumber != 'null' ">
+                and yonghu.id_number like CONCAT('%',#{params.idNumber},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+        </where>
+        order by a.id desc
+    </select>
+
+
+
+
+
+    <select id="groupBar"  resultType="java.util.HashMap" >
+        select c.exam_name,c.kemu_types,d.index_name,avg(c.fraction) as "avg" from chengji c LEFT JOIN dictionary d on c.kemu_types=d.code_index
+        where d.dic_code="kemu_types"
+        GROUP BY c.exam_name,c.kemu_types
+    </select>
+
+
+</mapper>
